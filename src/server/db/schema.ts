@@ -46,7 +46,7 @@ export const user = createTable("user", (d) => ({
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
-  collegeIdx: index('college_dept_id_idx').on(t.college, t.department, t.name, t.role, t.email, t.id)
+  collegeIdx: index('user_idx').on(t.college, t.department, t.name, t.role, t.email, t.id)
 }));
 
 export const session = createTable("session", (d) => ({
