@@ -239,6 +239,7 @@ export const streak = createTable("streak", (d) => ({
 export const xp = createTable("xp", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }).primaryKey(),
   xp: d.integer().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const xpLog = createTable("xp_log", (d) => ({
@@ -254,7 +255,9 @@ export const badge = createTable("badge", (d) => ({
   image: d.text(),
   title: d.text().unique(),
   description: d.text(),
-  conditions: d.jsonb()
+  conditions: d.jsonb(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }))
 
 export const badgeAssignment = createTable("badge_assignment", (d) => ({
