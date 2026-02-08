@@ -203,7 +203,7 @@ export const streak = pgTable("streak", (d) => ({
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
-  userDateUnique: uniqueIndex('user_date_unique_idx').on(t.userId, t.date)
+  pk: primaryKey({ columns: [t.userId, t.date] })
 }));
 
 
