@@ -6,6 +6,7 @@ import {
   pgEnum,
   uniqueIndex,
   pgTable,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 /* -------------------- TYPES -------------------- */
@@ -46,7 +47,7 @@ export const user = pgTable("user", (d) => ({
   createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
   updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }), (t) => ({
-  collegeIdx: index('college_dept_id_idx').on(t.college, t.department, t.id)
+  collegeIdx: index('college_dept_id_idx').on(t.college, t.department, t.name, t.role, t.email, t.id)
 }));
 
 export const session = pgTable("session", (d) => ({
@@ -91,7 +92,7 @@ export const verification = pgTable("verification", (d) => ({
 
 
 export const userMeta = pgTable("user_meta", (d) => ({
-  userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }).primaryKey(),
   phone_number: d.text(),
   address: d.text(),
   // Add other metadata fields as needed
@@ -154,6 +155,8 @@ export const quizAttempts = pgTable("quiz_attempts", (d) => ({
   quizId: d.integer().notNull().references(() => endQuiz.id, { onDelete: "cascade" }),
   score: d.integer().notNull(),
   attemptedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+}), (t) => ({
+  userQuizUnique: index('user_quiz_unique_idx').on(t.userId, t.quizId)
 }));
 
 
@@ -164,7 +167,7 @@ export const enrollments = pgTable("enrollments", (d) => ({
   deadline: d.integer().default(0),//in days // 0 means no deadline 
   enrolledAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }), (t) => ({
-  userCourseUnique: uniqueIndex('user_course_unique_idx').on(t.userId, t.courseId)
+  pk: primaryKey({ columns: [t.userId, t.courseId] }),
 }));
 
 export const progress = pgTable("progress", (d) => ({
@@ -172,7 +175,7 @@ export const progress = pgTable("progress", (d) => ({
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   completedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }), (t) => ({
-  userContentUnique: uniqueIndex('user_content_unique_idx').on(t.userId, t.contentId)
+  pk: primaryKey({ columns: [t.userId, t.contentId] }),
 }));
 
 export const feedback = pgTable("feedback", (d) => ({
@@ -196,7 +199,7 @@ export const speedLogs = pgTable("speed_logs", (d) => ({
 
 // gamification tables 
 
-export const streak = pgTable("steak_", (d) => ({
+export const streak = pgTable("streak", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   count: d.integer().notNull(),
   date: d.date().notNull(),
@@ -207,7 +210,7 @@ export const streak = pgTable("steak_", (d) => ({
 }));
 
 
-export const xp = pgTable("xp_", (d) => ({
+export const xp = pgTable("xp", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   xp: d.integer().notNull(),
 }));
@@ -220,7 +223,7 @@ export const xpLog = pgTable("xp_log", (d) => ({
   createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }));
 
-export const badge = pgTable("badge_", (d) => ({
+export const badge = pgTable("badge", (d) => ({
   id: d.serial().primaryKey(),
   image: d.text(),
   title: d.text().unique(),
