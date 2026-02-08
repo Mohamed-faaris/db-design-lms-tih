@@ -113,10 +113,15 @@ export const content = pgTable("content", (d) => ({
   order: d.integer().notNull(),
   title: d.text().notNull(),
   body: d.text(),
-  videoId: d.text().notNull(),
+  type: d.text().notNull(),// e.g., "video", "article"
+  contentUrl: d.text(), // URL for video or other content
+  contentMeta: d.jsonb(), // Additional metadata (e.g., video duration)
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
+  courseOrderIdx: uniqueIndex('course_order_idx').on(t.courseId, t.order)
 }));
+
 
 export const comments = pgTable("comments", (d) => ({
   id: d.serial().primaryKey(),
@@ -130,11 +135,20 @@ export const comments = pgTable("comments", (d) => ({
   parentReference: index('parent_comment_idx').on(t.parentCommentId)
 }));
 
+const question = pgTable("question", (d) => ({
+  id: d.serial().primaryKey(),
+  type: d.text().notNull(), // e.g., "multiple-choice", "true-false"
+  questionText: d.text().notNull(),
+  options: d.jsonb(), // For multiple-choice questions
+  correctAnswer: d.jsonb().notNull(), // Can store correct answer(s) in a flexible format
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
+}));
 
 export const endQuiz = pgTable("end_quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
-  question: d.jsonb().notNull(),
+  questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
@@ -143,10 +157,12 @@ export const modelQuiz = pgTable("model_quiz_", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   timeStamp: d.integer().notNull(), //in seconds
-  question: d.jsonb().notNull(),
+  questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
+
+
 
 export const quizAttempts = pgTable("quiz_attempts", (d) => ({
   id: d.serial().primaryKey(),
