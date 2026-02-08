@@ -1,5 +1,3 @@
-import { relations } from "drizzle-orm";
-import { convertIndexToString } from "drizzle-orm/mysql-core";
 import {
   index,
   pgTableCreator,
@@ -42,10 +40,10 @@ export const user = pgTable("user", (d) => ({
   department: department("department").notNull(),
   role: rolesEnum("role").notNull(),
   email: d.text().notNull().unique(),
-  emailVerified: d.boolean().$defaultFn(() => false).notNull(),
+  emailVerified: d.boolean().default(false).notNull(),
   image: d.text(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   collegeIdx: index('college_dept_id_idx').on(t.college, t.department, t.name, t.role, t.email, t.id)
 }));
@@ -82,8 +80,8 @@ export const verification = pgTable("verification", (d) => ({
   identifier: d.text().notNull(),
   value: d.text().notNull(),
   expiresAt: d.timestamp().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()),
+  createdAt: d.timestamp().defaultNow(),
+  updatedAt: d.timestamp().defaultNow(),
 }));
 
 
@@ -97,16 +95,16 @@ export const userMeta = pgTable("user_meta", (d) => ({
   address: d.text(),
   // Add other metadata fields as needed
 
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const course = pgTable("course", (d) => ({
   id: d.serial().primaryKey(),
   title: d.text().notNull(),
   description: d.text(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const content = pgTable("content", (d) => ({
@@ -116,8 +114,8 @@ export const content = pgTable("content", (d) => ({
   title: d.text().notNull(),
   body: d.text(),
   videoId: d.text().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const comments = pgTable("comments", (d) => ({
@@ -126,8 +124,8 @@ export const comments = pgTable("comments", (d) => ({
   parentCommentId: d.integer(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   commentText: d.text().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   parentReference: index('parent_comment_idx').on(t.parentCommentId)
 }));
@@ -137,8 +135,8 @@ export const endQuiz = pgTable("end_quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   question: d.jsonb().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const modelQuiz = pgTable("model_quiz_", (d) => ({
@@ -146,8 +144,8 @@ export const modelQuiz = pgTable("model_quiz_", (d) => ({
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   timeStamp: d.integer().notNull(), //in seconds
   question: d.jsonb().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const quizAttempts = pgTable("quiz_attempts", (d) => ({
@@ -155,7 +153,7 @@ export const quizAttempts = pgTable("quiz_attempts", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   quizId: d.integer().notNull().references(() => endQuiz.id, { onDelete: "cascade" }),
   score: d.integer().notNull(),
-  attemptedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  attemptedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 
@@ -164,7 +162,7 @@ export const enrollments = pgTable("enrollments", (d) => ({
   enrolledBy: d.text().notNull().references(() => user.id),
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
   deadline: d.integer().default(0),//in days // 0 means no deadline 
-  enrolledAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  enrolledAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   pk: primaryKey({ columns: [t.userId, t.courseId] }),
 }));
@@ -172,7 +170,7 @@ export const enrollments = pgTable("enrollments", (d) => ({
 export const progress = pgTable("progress", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
-  completedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  completedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   pk: primaryKey({ columns: [t.userId, t.contentId] }),
 }));
@@ -183,7 +181,7 @@ export const feedback = pgTable("feedback", (d) => ({
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
   rating: d.integer(),
   comments: d.text(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const speedLogs = pgTable("speed_logs", (d) => ({
@@ -192,7 +190,7 @@ export const speedLogs = pgTable("speed_logs", (d) => ({
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   event: videoEvents("event").notNull(),
   speed: d.integer(),//round(speed * 100)
-  loggedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  loggedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 
@@ -202,8 +200,8 @@ export const streak = pgTable("streak", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   count: d.integer().notNull(),
   date: d.date().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   userDateUnique: uniqueIndex('user_date_unique_idx').on(t.userId, t.date)
 }));
@@ -219,7 +217,7 @@ export const xpLog = pgTable("xp_log", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   xpChange: d.integer().notNull(),
   reason: d.text().notNull(),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const badge = pgTable("badge", (d) => ({
@@ -233,7 +231,7 @@ export const badge = pgTable("badge", (d) => ({
 export const badgeAssignment = pgTable("badge_assignment", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   badgeId: d.integer().notNull().references(() => badge.id, { onDelete: "cascade" }),
-  assignedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  assignedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   pk: primaryKey({ columns: [t.userId, t.badgeId] })
 })
@@ -245,6 +243,6 @@ export const notifications = pgTable("notifications", (d) => ({
   subject: d.text().notNull(),
   description: d.text(),
   status: notificationsStatus("status").notNull().default("active"),
-  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }))
