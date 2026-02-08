@@ -139,7 +139,7 @@ export const comments = pgTable("comments", (d) => ({
   userIdIdx: index('comments_user_id_idx').on(t.userId)
 }));
 
-const question = pgTable("question", (d) => ({
+export const question = pgTable("question", (d) => ({
   id: d.serial().primaryKey(),
   type: d.text().notNull(), // e.g., "multiple-choice", "true-false"
   questionText: d.text().notNull(),
