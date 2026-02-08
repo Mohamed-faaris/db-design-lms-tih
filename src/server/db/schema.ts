@@ -27,7 +27,7 @@ export const department = pgEnum("department", ["CSE", "EEE", "ECE", "AI", "AIDS
 
 export const videoEvents = pgEnum("video_events", ["pause", "stop", "start"])
 
-export const notificationsStatus = pgEnum("notifications_status", ["active", "viewed", "delete"])
+export const notificationsStatus = pgEnum("notifications_status", ["active", "viewed", "deleted"])
 
 export const contentTypeEnum = pgEnum("content_type", ["video", "article", "ppt"])
 
@@ -199,6 +199,7 @@ export const progress = createTable("progress", (d) => ({
   completedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   pk: primaryKey({ columns: [t.userId, t.contentId] }),
+  index: index('progress_user_time_idx').on(t.userId, t.completedAt),
 }));
 
 export const feedback = createTable("feedback", (d) => ({
@@ -215,7 +216,7 @@ export const speedLogs = createTable("speed_logs", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   event: videoEvents("event").notNull(),
-  speed: d.integer(),//round(speed * 100)
+  speed: d.numeric(4, 2),
   loggedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
   userIdIdx: index('speed_logs_user_id_idx').on(t.userId),
