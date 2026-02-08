@@ -3,7 +3,6 @@ import {
   pgTableCreator,
   pgEnum,
   uniqueIndex,
-  pgTable,
   primaryKey,
 } from "drizzle-orm/pg-core";
 
@@ -35,7 +34,7 @@ export const contentTypeEnum = pgEnum("content_type", ["video", "article", "ppt"
 
 /* -------------------- AUTH TABLES -------------------- */
 
-export const user = pgTable("user", (d) => ({
+export const user = createTable("user", (d) => ({
   id: d.text().primaryKey(),
   name: d.text().notNull(),
   college: college("college").notNull(),
@@ -50,7 +49,7 @@ export const user = pgTable("user", (d) => ({
   collegeIdx: index('college_dept_id_idx').on(t.college, t.department, t.name, t.role, t.email, t.id)
 }));
 
-export const session = pgTable("session", (d) => ({
+export const session = createTable("session", (d) => ({
   id: d.text().primaryKey(),
   expiresAt: d.timestamp().notNull(),
   token: d.text().notNull().unique(),
@@ -61,7 +60,7 @@ export const session = pgTable("session", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
 }));
 
-export const account = pgTable("account", (d) => ({
+export const account = createTable("account", (d) => ({
   id: d.text().primaryKey(),
   accountId: d.text().notNull(),
   providerId: d.text().notNull(),
@@ -77,7 +76,7 @@ export const account = pgTable("account", (d) => ({
   updatedAt: d.timestamp().notNull(),
 }));
 
-export const verification = pgTable("verification", (d) => ({
+export const verification = createTable("verification", (d) => ({
   id: d.text().primaryKey(),
   identifier: d.text().notNull(),
   value: d.text().notNull(),
@@ -91,7 +90,7 @@ export const verification = pgTable("verification", (d) => ({
 
 
 
-export const userMeta = pgTable("user_meta", (d) => ({
+export const userMeta = createTable("user_meta", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }).primaryKey(),
   phone_number: d.text(),
   address: d.text(),
@@ -101,7 +100,7 @@ export const userMeta = pgTable("user_meta", (d) => ({
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
-export const course = pgTable("course", (d) => ({
+export const course = createTable("course", (d) => ({
   id: d.serial().primaryKey(),
   title: d.text().notNull(),
   description: d.text(),
@@ -109,7 +108,7 @@ export const course = pgTable("course", (d) => ({
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
-export const content = pgTable("content", (d) => ({
+export const content = createTable("content", (d) => ({
   id: d.serial().primaryKey(),
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
   order: d.integer().notNull(),
@@ -125,7 +124,7 @@ export const content = pgTable("content", (d) => ({
 }));
 
 
-export const comments = pgTable("comments", (d) => ({
+export const comments = createTable("comments", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   parentCommentId: d.integer(),
@@ -139,7 +138,7 @@ export const comments = pgTable("comments", (d) => ({
   userIdIdx: index('comments_user_id_idx').on(t.userId)
 }));
 
-export const question = pgTable("question", (d) => ({
+export const question = createTable("question", (d) => ({
   id: d.serial().primaryKey(),
   type: d.text().notNull(), // e.g., "multiple-choice", "true-false"
   questionText: d.text().notNull(),
@@ -149,7 +148,7 @@ export const question = pgTable("question", (d) => ({
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
-export const endQuiz = pgTable("end_quiz", (d) => ({
+export const endQuiz = createTable("end_quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
@@ -159,7 +158,7 @@ export const endQuiz = pgTable("end_quiz", (d) => ({
   contentIdIdx: index('end_quiz_content_id_idx').on(t.contentId)
 }));
 
-export const modelQuiz = pgTable("model_quiz", (d) => ({
+export const modelQuiz = createTable("model_quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   timeStamp: d.integer().notNull(), //in seconds
@@ -172,7 +171,7 @@ export const modelQuiz = pgTable("model_quiz", (d) => ({
 
 
 
-export const quizAttempts = pgTable("quiz_attempts", (d) => ({
+export const quizAttempts = createTable("quiz_attempts", (d) => ({
   id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   quizId: d.integer().notNull().references(() => endQuiz.id, { onDelete: "cascade" }),
@@ -184,7 +183,7 @@ export const quizAttempts = pgTable("quiz_attempts", (d) => ({
 }));
 
 
-export const enrollments = pgTable("enrollments", (d) => ({
+export const enrollments = createTable("enrollments", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   enrolledBy: d.text().notNull().references(() => user.id),
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
@@ -194,7 +193,7 @@ export const enrollments = pgTable("enrollments", (d) => ({
   pk: primaryKey({ columns: [t.userId, t.courseId] }),
 }));
 
-export const progress = pgTable("progress", (d) => ({
+export const progress = createTable("progress", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   completedAt: d.timestamp().defaultNow().notNull(),
@@ -202,7 +201,7 @@ export const progress = pgTable("progress", (d) => ({
   pk: primaryKey({ columns: [t.userId, t.contentId] }),
 }));
 
-export const feedback = pgTable("feedback", (d) => ({
+export const feedback = createTable("feedback", (d) => ({
   id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
@@ -211,7 +210,7 @@ export const feedback = pgTable("feedback", (d) => ({
   createdAt: d.timestamp().defaultNow().notNull(),
 }));
 
-export const speedLogs = pgTable("speed_logs", (d) => ({
+export const speedLogs = createTable("speed_logs", (d) => ({
   id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
@@ -226,7 +225,7 @@ export const speedLogs = pgTable("speed_logs", (d) => ({
 
 // gamification tables 
 
-export const streak = pgTable("streak", (d) => ({
+export const streak = createTable("streak", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   count: d.integer().notNull(),
   date: d.date().notNull(),
@@ -237,12 +236,12 @@ export const streak = pgTable("streak", (d) => ({
 }));
 
 
-export const xp = pgTable("xp", (d) => ({
+export const xp = createTable("xp", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }).primaryKey(),
   xp: d.integer().notNull(),
 }));
 
-export const xpLog = pgTable("xp_log", (d) => ({
+export const xpLog = createTable("xp_log", (d) => ({
   id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   xpChange: d.integer().notNull(),
@@ -250,7 +249,7 @@ export const xpLog = pgTable("xp_log", (d) => ({
   createdAt: d.timestamp().defaultNow().notNull(),
 }));
 
-export const badge = pgTable("badge", (d) => ({
+export const badge = createTable("badge", (d) => ({
   id: d.serial().primaryKey(),
   image: d.text(),
   title: d.text().unique(),
@@ -258,7 +257,7 @@ export const badge = pgTable("badge", (d) => ({
   conditions: d.jsonb()
 }))
 
-export const badgeAssignment = pgTable("badge_assignment", (d) => ({
+export const badgeAssignment = createTable("badge_assignment", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   badgeId: d.integer().notNull().references(() => badge.id, { onDelete: "cascade" }),
   assignedAt: d.timestamp().defaultNow().notNull(),
@@ -267,7 +266,7 @@ export const badgeAssignment = pgTable("badge_assignment", (d) => ({
 })
 )
 
-export const notifications = pgTable("notifications", (d) => ({
+export const notifications = createTable("notifications", (d) => ({
   id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   subject: d.text().notNull(),
