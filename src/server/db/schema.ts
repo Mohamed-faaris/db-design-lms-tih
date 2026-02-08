@@ -21,13 +21,15 @@ export const createTable = pgTableCreator(
 
 
 /* 1. Managers (needs roles enum) */
-export const rolesEnum = pgEnum("roles", ["admin", "manager", "staff"]);
+export const rolesEnum = pgEnum("roles", ["superAdmin", "admin", "manager", "staff"]);
 
 export const college = pgEnum("college", ["krce", "krct", "mkce"])
 
 export const department = pgEnum("department", ["CSE", "EEE", "ECE", "AI", "AIDS"])
 
 export const videoEvents = pgEnum("video_events", ["pause", "stop", "start"])
+
+export const notificationsStatus = pgEnum("notifications_status", ["active", "viewed", "delete"])
 
 
 /* -------------------- AUTH TABLES -------------------- */
@@ -111,7 +113,7 @@ export const content = pgTable("content", (d) => ({
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
   order: d.integer().notNull(),
   title: d.text().notNull(),
-  body: d.text().notNull(),
+  body: d.text(),
   videoId: d.text().notNull(),
   createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
   updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
@@ -157,6 +159,7 @@ export const quizAttempts = pgTable("quiz_attempts", (d) => ({
 
 export const enrollments = pgTable("enrollments", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  enrolledBy: d.text().notNull().references(() => user.id),
   courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
   deadline: d.integer().default(0),//in days // 0 means no deadline 
   enrolledAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
@@ -193,7 +196,7 @@ export const speedLogs = pgTable("speed_logs", (d) => ({
 
 // gamification tables 
 
-export const steak = pgTable("steak_", (d) => ({
+export const streak = pgTable("steak_", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   count: d.integer().notNull(),
   date: d.date().notNull(),
@@ -203,9 +206,17 @@ export const steak = pgTable("steak_", (d) => ({
   userDateUnique: uniqueIndex('user_date_unique_idx').on(t.userId, t.date)
 }));
 
+
 export const xp = pgTable("xp_", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   xp: d.integer().notNull(),
+}));
+
+export const xpLog = pgTable("xp_log", (d) => ({
+  id: d.serial().primaryKey(),
+  userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  xpChange: d.integer().notNull(),
+  reason: d.text().notNull(),
   createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }));
 
@@ -214,7 +225,7 @@ export const badge = pgTable("badge_", (d) => ({
   image: d.text(),
   title: d.text().unique(),
   description: d.text(),
-  conditions: d.jsonb()  
+  conditions: d.jsonb()
 }))
 
 export const badgeAssignment = pgTable("badge_assignment", (d) => ({
@@ -223,3 +234,11 @@ export const badgeAssignment = pgTable("badge_assignment", (d) => ({
   assignedAt: d.timestamp()
 }))
 
+export const notifications = pgTable("notifications", (d) => ({
+  userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  subject: d.text().notNull(),
+  description: d.text(),
+  status: notificationsStatus().notNull().default("active"),
+  createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+  updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+}))

@@ -1,5 +1,6 @@
 CREATE TYPE "public"."college" AS ENUM('krce', 'krct', 'mkce');--> statement-breakpoint
 CREATE TYPE "public"."department" AS ENUM('CSE', 'EEE', 'ECE', 'AI', 'AIDS');--> statement-breakpoint
+CREATE TYPE "public"."notifications_status" AS ENUM('active', 'viewed', 'delete');--> statement-breakpoint
 CREATE TYPE "public"."roles" AS ENUM('admin', 'manager', 'staff');--> statement-breakpoint
 CREATE TYPE "public"."video_events" AS ENUM('pause', 'stop', 'start');--> statement-breakpoint
 CREATE TABLE "account" (
@@ -16,6 +17,21 @@ CREATE TABLE "account" (
 	"password" text,
 	"createdAt" timestamp NOT NULL,
 	"updatedAt" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "badge_" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"image" text,
+	"title" text,
+	"description" text,
+	"conditions" jsonb,
+	CONSTRAINT "badge__title_unique" UNIQUE("title")
+);
+--> statement-breakpoint
+CREATE TABLE "badge_assignment" (
+	"userId" text NOT NULL,
+	"badgeId" integer NOT NULL,
+	"assignedAt" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "comments" (
@@ -49,7 +65,7 @@ CREATE TABLE "course" (
 --> statement-breakpoint
 CREATE TABLE "end_quiz" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"courseId" integer NOT NULL,
+	"contentId" integer NOT NULL,
 	"question" jsonb NOT NULL,
 	"createdAt" timestamp NOT NULL,
 	"updatedAt" timestamp NOT NULL
@@ -76,6 +92,15 @@ CREATE TABLE "model_quiz_" (
 	"contentId" integer NOT NULL,
 	"timeStamp" integer NOT NULL,
 	"question" jsonb NOT NULL,
+	"createdAt" timestamp NOT NULL,
+	"updatedAt" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "notifications" (
+	"userId" text NOT NULL,
+	"subject" text NOT NULL,
+	"description" text,
+	"status" "notifications_status" DEFAULT 'active' NOT NULL,
 	"createdAt" timestamp NOT NULL,
 	"updatedAt" timestamp NOT NULL
 );
@@ -114,6 +139,14 @@ CREATE TABLE "speed_logs" (
 	"loggedAt" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "steak_" (
+	"userId" text NOT NULL,
+	"count" integer NOT NULL,
+	"date" date NOT NULL,
+	"createdAt" timestamp NOT NULL,
+	"updatedAt" timestamp NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -145,16 +178,25 @@ CREATE TABLE "verification" (
 	"updatedAt" timestamp
 );
 --> statement-breakpoint
+CREATE TABLE "xp_" (
+	"userId" text NOT NULL,
+	"xp" integer NOT NULL,
+	"createdAt" timestamp NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "badge_assignment" ADD CONSTRAINT "badge_assignment_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "badge_assignment" ADD CONSTRAINT "badge_assignment_badgeId_badge__id_fk" FOREIGN KEY ("badgeId") REFERENCES "public"."badge_"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "comments" ADD CONSTRAINT "comments_contentId_content_id_fk" FOREIGN KEY ("contentId") REFERENCES "public"."content"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "comments" ADD CONSTRAINT "comments_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "content" ADD CONSTRAINT "content_courseId_course_id_fk" FOREIGN KEY ("courseId") REFERENCES "public"."course"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "end_quiz" ADD CONSTRAINT "end_quiz_courseId_course_id_fk" FOREIGN KEY ("courseId") REFERENCES "public"."course"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "end_quiz" ADD CONSTRAINT "end_quiz_contentId_content_id_fk" FOREIGN KEY ("contentId") REFERENCES "public"."content"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_courseId_course_id_fk" FOREIGN KEY ("courseId") REFERENCES "public"."course"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_courseId_course_id_fk" FOREIGN KEY ("courseId") REFERENCES "public"."course"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "model_quiz_" ADD CONSTRAINT "model_quiz__contentId_content_id_fk" FOREIGN KEY ("contentId") REFERENCES "public"."content"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "progress" ADD CONSTRAINT "progress_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "progress" ADD CONSTRAINT "progress_contentId_content_id_fk" FOREIGN KEY ("contentId") REFERENCES "public"."content"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quiz_attempts" ADD CONSTRAINT "quiz_attempts_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -162,8 +204,11 @@ ALTER TABLE "quiz_attempts" ADD CONSTRAINT "quiz_attempts_quizId_end_quiz_id_fk"
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "speed_logs" ADD CONSTRAINT "speed_logs_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "speed_logs" ADD CONSTRAINT "speed_logs_contentId_content_id_fk" FOREIGN KEY ("contentId") REFERENCES "public"."content"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "steak_" ADD CONSTRAINT "steak__userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_meta" ADD CONSTRAINT "user_meta_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "xp_" ADD CONSTRAINT "xp__userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "parent_comment_idx" ON "comments" USING btree ("parentCommentId");--> statement-breakpoint
 CREATE UNIQUE INDEX "user_course_unique_idx" ON "enrollments" USING btree ("userId","courseId");--> statement-breakpoint
 CREATE UNIQUE INDEX "user_content_unique_idx" ON "progress" USING btree ("userId","contentId");--> statement-breakpoint
+CREATE UNIQUE INDEX "user_date_unique_idx" ON "steak_" USING btree ("userId","date");--> statement-breakpoint
 CREATE INDEX "college_dept_id_idx" ON "user" USING btree ("college","department","id");
