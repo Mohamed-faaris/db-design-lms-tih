@@ -132,7 +132,9 @@ export const comments = pgTable("comments", (d) => ({
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
-  parentReference: index('parent_comment_idx').on(t.parentCommentId)
+  parentReference: index('parent_comment_idx').on(t.parentCommentId),
+  contentIdIdx: index('comments_content_id_idx').on(t.contentId),
+  userIdIdx: index('comments_user_id_idx').on(t.userId)
 }));
 
 const question = pgTable("question", (d) => ({
@@ -151,15 +153,19 @@ export const endQuiz = pgTable("end_quiz", (d) => ({
   questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
+  contentIdIdx: index('end_quiz_content_id_idx').on(t.contentId)
 }));
 
-export const modelQuiz = pgTable("model_quiz_", (d) => ({
+export const modelQuiz = pgTable("model_quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   timeStamp: d.integer().notNull(), //in seconds
   questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
+  contentIdIdx: index('model_quiz_content_id_idx').on(t.contentId)
 }));
 
 
@@ -170,6 +176,9 @@ export const quizAttempts = pgTable("quiz_attempts", (d) => ({
   quizId: d.integer().notNull().references(() => endQuiz.id, { onDelete: "cascade" }),
   score: d.integer().notNull(),
   attemptedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
+  userIdIdx: index('quiz_attempts_user_id_idx').on(t.userId),
+  // quizIdIdx: index('quiz_attempts_quiz_id_idx').on(t.quizId)
 }));
 
 
@@ -207,6 +216,9 @@ export const speedLogs = pgTable("speed_logs", (d) => ({
   event: videoEvents("event").notNull(),
   speed: d.integer(),//round(speed * 100)
   loggedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
+  userIdIdx: index('speed_logs_user_id_idx').on(t.userId),
+  contentIdIdx: index('speed_logs_content_id_idx').on(t.contentId)
 }));
 
 
@@ -261,4 +273,6 @@ export const notifications = pgTable("notifications", (d) => ({
   status: notificationsStatus("status").notNull().default("active"),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
+  userIdIdx: index('notifications_user_id_idx').on(t.userId)
 }))
