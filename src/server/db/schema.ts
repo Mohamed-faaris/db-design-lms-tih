@@ -156,7 +156,7 @@ export const quizAttempts = pgTable("quiz_attempts", (d) => ({
   score: d.integer().notNull(),
   attemptedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }), (t) => ({
-  userQuizUnique: index('user_quiz_unique_idx').on(t.userId, t.quizId)
+  pk: primaryKey({ columns: [t.userId, t.quizId] }),
 }));
 
 
@@ -211,7 +211,7 @@ export const streak = pgTable("streak", (d) => ({
 
 
 export const xp = pgTable("xp", (d) => ({
-  userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }).primaryKey(),
   xp: d.integer().notNull(),
 }));
 
@@ -234,14 +234,18 @@ export const badge = pgTable("badge", (d) => ({
 export const badgeAssignment = pgTable("badge_assignment", (d) => ({
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   badgeId: d.integer().notNull().references(() => badge.id, { onDelete: "cascade" }),
-  assignedAt: d.timestamp()
-}))
+  assignedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
+}), (t) => ({
+  pk: primaryKey({ columns: [t.userId, t.badgeId] })
+})
+)
 
 export const notifications = pgTable("notifications", (d) => ({
+  id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   subject: d.text().notNull(),
   description: d.text(),
-  status: notificationsStatus().notNull().default("active"),
+  status: notificationsStatus("status").notNull().default("active"),
   createdAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
   updatedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
 }))
