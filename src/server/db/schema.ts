@@ -151,12 +151,11 @@ export const modelQuiz = pgTable("model_quiz_", (d) => ({
 }));
 
 export const quizAttempts = pgTable("quiz_attempts", (d) => ({
+  id: d.serial().primaryKey(),
   userId: d.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   quizId: d.integer().notNull().references(() => endQuiz.id, { onDelete: "cascade" }),
   score: d.integer().notNull(),
   attemptedAt: d.timestamp().$defaultFn(() => new Date()).notNull(),
-}), (t) => ({
-  pk: primaryKey({ columns: [t.userId, t.quizId] }),
 }));
 
 
