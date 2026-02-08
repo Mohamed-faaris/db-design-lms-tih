@@ -30,6 +30,8 @@ export const videoEvents = pgEnum("video_events", ["pause", "stop", "start"])
 
 export const notificationsStatus = pgEnum("notifications_status", ["active", "viewed", "delete"])
 
+export const contentTypeEnum = pgEnum("content_type", ["video", "article", "ppt"])
+
 
 /* -------------------- AUTH TABLES -------------------- */
 
@@ -113,7 +115,7 @@ export const content = pgTable("content", (d) => ({
   order: d.integer().notNull(),
   title: d.text().notNull(),
   body: d.text(),
-  type: d.text().notNull(),// e.g., "video", "article"
+  type: contentTypeEnum("content_type").notNull(),// e.g., "video", "article"
   contentUrl: d.text(), // URL for video or other content
   contentMeta: d.jsonb(), // Additional metadata (e.g., video duration)
   createdAt: d.timestamp().defaultNow().notNull(),
