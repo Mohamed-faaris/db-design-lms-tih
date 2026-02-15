@@ -1,11 +1,11 @@
 {
-  "id": "52965189-3fe8-4926-993f-c76ffee66695",
+  "id": "517cab8e-fff0-40f6-bc56-cf25db066552",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.account": {
-      "name": "account",
+    "public.Learning_portal_account": {
+      "name": "Learning_portal_account",
       "schema": "",
       "columns": {
         "id": {
@@ -89,10 +89,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "account_userId_user_id_fk": {
-          "name": "account_userId_user_id_fk",
-          "tableFrom": "account",
-          "tableTo": "user",
+        "Learning_portal_account_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_account_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_account",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -109,8 +109,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.badge_": {
-      "name": "badge_",
+    "public.Learning_portal_badge": {
+      "name": "Learning_portal_badge",
       "schema": "",
       "columns": {
         "id": {
@@ -142,14 +142,28 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "badge__title_unique": {
-          "name": "badge__title_unique",
+        "Learning_portal_badge_title_unique": {
+          "name": "Learning_portal_badge_title_unique",
           "nullsNotDistinct": false,
           "columns": [
             "title"
@@ -160,8 +174,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.badge_assignment": {
-      "name": "badge_assignment",
+    "public.Learning_portal_badge_assignment": {
+      "name": "Learning_portal_badge_assignment",
       "schema": "",
       "columns": {
         "userId": {
@@ -180,15 +194,16 @@
           "name": "assignedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "badge_assignment_userId_user_id_fk": {
-          "name": "badge_assignment_userId_user_id_fk",
-          "tableFrom": "badge_assignment",
-          "tableTo": "user",
+        "Learning_portal_badge_assignment_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_badge_assignment_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_badge_assignment",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -198,10 +213,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "badge_assignment_badgeId_badge__id_fk": {
-          "name": "badge_assignment_badgeId_badge__id_fk",
-          "tableFrom": "badge_assignment",
-          "tableTo": "badge_",
+        "Learning_portal_badge_assignment_badgeId_Learning_portal_badge_id_fk": {
+          "name": "Learning_portal_badge_assignment_badgeId_Learning_portal_badge_id_fk",
+          "tableFrom": "Learning_portal_badge_assignment",
+          "tableTo": "Learning_portal_badge",
           "columnsFrom": [
             "badgeId"
           ],
@@ -212,14 +227,22 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "Learning_portal_badge_assignment_userId_badgeId_pk": {
+          "name": "Learning_portal_badge_assignment_userId_badgeId_pk",
+          "columns": [
+            "userId",
+            "badgeId"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.comments": {
-      "name": "comments",
+    "public.Learning_portal_comments": {
+      "name": "Learning_portal_comments",
       "schema": "",
       "columns": {
         "id": {
@@ -256,13 +279,15 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
@@ -280,13 +305,43 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "comments_content_id_idx": {
+          "name": "comments_content_id_idx",
+          "columns": [
+            {
+              "expression": "contentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "comments_user_id_idx": {
+          "name": "comments_user_id_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "comments_contentId_content_id_fk": {
-          "name": "comments_contentId_content_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "content",
+        "Learning_portal_comments_contentId_Learning_portal_content_id_fk": {
+          "name": "Learning_portal_comments_contentId_Learning_portal_content_id_fk",
+          "tableFrom": "Learning_portal_comments",
+          "tableTo": "Learning_portal_content",
           "columnsFrom": [
             "contentId"
           ],
@@ -296,10 +351,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "comments_userId_user_id_fk": {
-          "name": "comments_userId_user_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "user",
+        "Learning_portal_comments_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_comments_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_comments",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -316,8 +371,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.content": {
-      "name": "content",
+    "public.Learning_portal_content": {
+      "name": "Learning_portal_content",
       "schema": "",
       "columns": {
         "id": {
@@ -348,33 +403,70 @@
           "name": "body",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "videoId": {
-          "name": "videoId",
-          "type": "text",
+        "content_type": {
+          "name": "content_type",
+          "type": "content_type",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "contentUrl": {
+          "name": "contentUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentMeta": {
+          "name": "contentMeta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
         },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "course_order_idx": {
+          "name": "course_order_idx",
+          "columns": [
+            {
+              "expression": "courseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "content_courseId_course_id_fk": {
-          "name": "content_courseId_course_id_fk",
-          "tableFrom": "content",
-          "tableTo": "course",
+        "Learning_portal_content_courseId_Learning_portal_course_id_fk": {
+          "name": "Learning_portal_content_courseId_Learning_portal_course_id_fk",
+          "tableFrom": "Learning_portal_content",
+          "tableTo": "Learning_portal_course",
           "columnsFrom": [
             "courseId"
           ],
@@ -391,8 +483,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.course": {
-      "name": "course",
+    "public.Learning_portal_course": {
+      "name": "Learning_portal_course",
       "schema": "",
       "columns": {
         "id": {
@@ -417,13 +509,15 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -434,8 +528,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.end_quiz": {
-      "name": "end_quiz",
+    "public.Learning_portal_end_quiz": {
+      "name": "Learning_portal_end_quiz",
       "schema": "",
       "columns": {
         "id": {
@@ -450,9 +544,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "question": {
-          "name": "question",
-          "type": "jsonb",
+        "questionId": {
+          "name": "questionId",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -460,23 +554,54 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "end_quiz_content_id_idx": {
+          "name": "end_quiz_content_id_idx",
+          "columns": [
+            {
+              "expression": "contentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "end_quiz_contentId_content_id_fk": {
-          "name": "end_quiz_contentId_content_id_fk",
-          "tableFrom": "end_quiz",
-          "tableTo": "content",
+        "Learning_portal_end_quiz_contentId_Learning_portal_content_id_fk": {
+          "name": "Learning_portal_end_quiz_contentId_Learning_portal_content_id_fk",
+          "tableFrom": "Learning_portal_end_quiz",
+          "tableTo": "Learning_portal_content",
           "columnsFrom": [
             "contentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Learning_portal_end_quiz_questionId_Learning_portal_question_id_fk": {
+          "name": "Learning_portal_end_quiz_questionId_Learning_portal_question_id_fk",
+          "tableFrom": "Learning_portal_end_quiz",
+          "tableTo": "Learning_portal_question",
+          "columnsFrom": [
+            "questionId"
           ],
           "columnsTo": [
             "id"
@@ -491,12 +616,18 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.enrollments": {
-      "name": "enrollments",
+    "public.Learning_portal_enrollments": {
+      "name": "Learning_portal_enrollments",
       "schema": "",
       "columns": {
         "userId": {
           "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "enrolledBy": {
+          "name": "enrolledBy",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -518,37 +649,16 @@
           "name": "enrolledAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {
-        "user_course_unique_idx": {
-          "name": "user_course_unique_idx",
-          "columns": [
-            {
-              "expression": "userId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "courseId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "enrollments_userId_user_id_fk": {
-          "name": "enrollments_userId_user_id_fk",
-          "tableFrom": "enrollments",
-          "tableTo": "user",
+        "Learning_portal_enrollments_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_enrollments_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_enrollments",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -558,10 +668,23 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "enrollments_courseId_course_id_fk": {
-          "name": "enrollments_courseId_course_id_fk",
-          "tableFrom": "enrollments",
-          "tableTo": "course",
+        "Learning_portal_enrollments_enrolledBy_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_enrollments_enrolledBy_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_enrollments",
+          "tableTo": "Learning_portal_user",
+          "columnsFrom": [
+            "enrolledBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "Learning_portal_enrollments_courseId_Learning_portal_course_id_fk": {
+          "name": "Learning_portal_enrollments_courseId_Learning_portal_course_id_fk",
+          "tableFrom": "Learning_portal_enrollments",
+          "tableTo": "Learning_portal_course",
           "columnsFrom": [
             "courseId"
           ],
@@ -572,14 +695,22 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "Learning_portal_enrollments_userId_courseId_pk": {
+          "name": "Learning_portal_enrollments_userId_courseId_pk",
+          "columns": [
+            "userId",
+            "courseId"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.feedback": {
-      "name": "feedback",
+    "public.Learning_portal_feedback": {
+      "name": "Learning_portal_feedback",
       "schema": "",
       "columns": {
         "id": {
@@ -616,15 +747,16 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "feedback_userId_user_id_fk": {
-          "name": "feedback_userId_user_id_fk",
-          "tableFrom": "feedback",
-          "tableTo": "user",
+        "Learning_portal_feedback_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_feedback_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_feedback",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -634,10 +766,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "feedback_courseId_course_id_fk": {
-          "name": "feedback_courseId_course_id_fk",
-          "tableFrom": "feedback",
-          "tableTo": "course",
+        "Learning_portal_feedback_courseId_Learning_portal_course_id_fk": {
+          "name": "Learning_portal_feedback_courseId_Learning_portal_course_id_fk",
+          "tableFrom": "Learning_portal_feedback",
+          "tableTo": "Learning_portal_course",
           "columnsFrom": [
             "courseId"
           ],
@@ -654,8 +786,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.model_quiz_": {
-      "name": "model_quiz_",
+    "public.Learning_portal_model_quiz": {
+      "name": "Learning_portal_model_quiz",
       "schema": "",
       "columns": {
         "id": {
@@ -676,9 +808,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "question": {
-          "name": "question",
-          "type": "jsonb",
+        "questionId": {
+          "name": "questionId",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -686,23 +818,54 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "model_quiz_content_id_idx": {
+          "name": "model_quiz_content_id_idx",
+          "columns": [
+            {
+              "expression": "contentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "model_quiz__contentId_content_id_fk": {
-          "name": "model_quiz__contentId_content_id_fk",
-          "tableFrom": "model_quiz_",
-          "tableTo": "content",
+        "Learning_portal_model_quiz_contentId_Learning_portal_content_id_fk": {
+          "name": "Learning_portal_model_quiz_contentId_Learning_portal_content_id_fk",
+          "tableFrom": "Learning_portal_model_quiz",
+          "tableTo": "Learning_portal_content",
           "columnsFrom": [
             "contentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Learning_portal_model_quiz_questionId_Learning_portal_question_id_fk": {
+          "name": "Learning_portal_model_quiz_questionId_Learning_portal_question_id_fk",
+          "tableFrom": "Learning_portal_model_quiz",
+          "tableTo": "Learning_portal_question",
+          "columnsFrom": [
+            "questionId"
           ],
           "columnsTo": [
             "id"
@@ -717,10 +880,16 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.notifications": {
-      "name": "notifications",
+    "public.Learning_portal_notifications": {
+      "name": "Learning_portal_notifications",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
         "userId": {
           "name": "userId",
           "type": "text",
@@ -751,21 +920,39 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "notifications_user_id_idx": {
+          "name": "notifications_user_id_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "notifications_userId_user_id_fk": {
-          "name": "notifications_userId_user_id_fk",
-          "tableFrom": "notifications",
-          "tableTo": "user",
+        "Learning_portal_notifications_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_notifications_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_notifications",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -782,8 +969,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.progress": {
-      "name": "progress",
+    "public.Learning_portal_progress": {
+      "name": "Learning_portal_progress",
       "schema": "",
       "columns": {
         "userId": {
@@ -802,12 +989,13 @@
           "name": "completedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "user_content_unique_idx": {
-          "name": "user_content_unique_idx",
+        "progress_user_time_idx": {
+          "name": "progress_user_time_idx",
           "columns": [
             {
               "expression": "userId",
@@ -816,23 +1004,23 @@
               "nulls": "last"
             },
             {
-              "expression": "contentId",
+              "expression": "completedAt",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
-          "isUnique": true,
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
         }
       },
       "foreignKeys": {
-        "progress_userId_user_id_fk": {
-          "name": "progress_userId_user_id_fk",
-          "tableFrom": "progress",
-          "tableTo": "user",
+        "Learning_portal_progress_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_progress_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_progress",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -842,10 +1030,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "progress_contentId_content_id_fk": {
-          "name": "progress_contentId_content_id_fk",
-          "tableFrom": "progress",
-          "tableTo": "content",
+        "Learning_portal_progress_contentId_Learning_portal_content_id_fk": {
+          "name": "Learning_portal_progress_contentId_Learning_portal_content_id_fk",
+          "tableFrom": "Learning_portal_progress",
+          "tableTo": "Learning_portal_content",
           "columnsFrom": [
             "contentId"
           ],
@@ -856,16 +1044,87 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {
+        "Learning_portal_progress_userId_contentId_pk": {
+          "name": "Learning_portal_progress_userId_contentId_pk",
+          "columns": [
+            "userId",
+            "contentId"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Learning_portal_question": {
+      "name": "Learning_portal_question",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "questionText": {
+          "name": "questionText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "options": {
+          "name": "options",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correctAnswer": {
+          "name": "correctAnswer",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.quiz_attempts": {
-      "name": "quiz_attempts",
+    "public.Learning_portal_quiz_attempts": {
+      "name": "Learning_portal_quiz_attempts",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
         "userId": {
           "name": "userId",
           "type": "text",
@@ -888,15 +1147,32 @@
           "name": "attemptedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "quiz_attempts_user_id_idx": {
+          "name": "quiz_attempts_user_id_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "quiz_attempts_userId_user_id_fk": {
-          "name": "quiz_attempts_userId_user_id_fk",
-          "tableFrom": "quiz_attempts",
-          "tableTo": "user",
+        "Learning_portal_quiz_attempts_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_quiz_attempts_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_quiz_attempts",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -906,10 +1182,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "quiz_attempts_quizId_end_quiz_id_fk": {
-          "name": "quiz_attempts_quizId_end_quiz_id_fk",
-          "tableFrom": "quiz_attempts",
-          "tableTo": "end_quiz",
+        "Learning_portal_quiz_attempts_quizId_Learning_portal_end_quiz_id_fk": {
+          "name": "Learning_portal_quiz_attempts_quizId_Learning_portal_end_quiz_id_fk",
+          "tableFrom": "Learning_portal_quiz_attempts",
+          "tableTo": "Learning_portal_end_quiz",
           "columnsFrom": [
             "quizId"
           ],
@@ -926,8 +1202,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.session": {
-      "name": "session",
+    "public.Learning_portal_session": {
+      "name": "Learning_portal_session",
       "schema": "",
       "columns": {
         "id": {
@@ -981,10 +1257,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "session_userId_user_id_fk": {
-          "name": "session_userId_user_id_fk",
-          "tableFrom": "session",
-          "tableTo": "user",
+        "Learning_portal_session_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_session_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_session",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -997,8 +1273,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "session_token_unique": {
-          "name": "session_token_unique",
+        "Learning_portal_session_token_unique": {
+          "name": "Learning_portal_session_token_unique",
           "nullsNotDistinct": false,
           "columns": [
             "token"
@@ -1009,8 +1285,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.speed_logs": {
-      "name": "speed_logs",
+    "public.Learning_portal_speed_logs": {
+      "name": "Learning_portal_speed_logs",
       "schema": "",
       "columns": {
         "id": {
@@ -1040,7 +1316,7 @@
         },
         "speed": {
           "name": "speed",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -1048,15 +1324,47 @@
           "name": "loggedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "speed_logs_user_id_idx": {
+          "name": "speed_logs_user_id_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "speed_logs_content_id_idx": {
+          "name": "speed_logs_content_id_idx",
+          "columns": [
+            {
+              "expression": "contentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "speed_logs_userId_user_id_fk": {
-          "name": "speed_logs_userId_user_id_fk",
-          "tableFrom": "speed_logs",
-          "tableTo": "user",
+        "Learning_portal_speed_logs_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_speed_logs_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_speed_logs",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -1066,10 +1374,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "speed_logs_contentId_content_id_fk": {
-          "name": "speed_logs_contentId_content_id_fk",
-          "tableFrom": "speed_logs",
-          "tableTo": "content",
+        "Learning_portal_speed_logs_contentId_Learning_portal_content_id_fk": {
+          "name": "Learning_portal_speed_logs_contentId_Learning_portal_content_id_fk",
+          "tableFrom": "Learning_portal_speed_logs",
+          "tableTo": "Learning_portal_content",
           "columnsFrom": [
             "contentId"
           ],
@@ -1086,8 +1394,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.steak_": {
-      "name": "steak_",
+    "public.Learning_portal_streak": {
+      "name": "Learning_portal_streak",
       "schema": "",
       "columns": {
         "userId": {
@@ -1112,43 +1420,23 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {
-        "user_date_unique_idx": {
-          "name": "user_date_unique_idx",
-          "columns": [
-            {
-              "expression": "userId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "steak__userId_user_id_fk": {
-          "name": "steak__userId_user_id_fk",
-          "tableFrom": "steak_",
-          "tableTo": "user",
+        "Learning_portal_streak_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_streak_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_streak",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -1159,14 +1447,22 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "Learning_portal_streak_userId_date_pk": {
+          "name": "Learning_portal_streak_userId_date_pk",
+          "columns": [
+            "userId",
+            "date"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user": {
-      "name": "user",
+    "public.Learning_portal_user": {
+      "name": "Learning_portal_user",
       "schema": "",
       "columns": {
         "id": {
@@ -1212,7 +1508,8 @@
           "name": "emailVerified",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": false
         },
         "image": {
           "name": "image",
@@ -1224,18 +1521,20 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "college_dept_id_idx": {
-          "name": "college_dept_id_idx",
+        "user_idx": {
+          "name": "user_idx",
           "columns": [
             {
               "expression": "college",
@@ -1245,6 +1544,24 @@
             },
             {
               "expression": "department",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "email",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1265,8 +1582,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "user_email_unique": {
-          "name": "user_email_unique",
+        "Learning_portal_user_email_unique": {
+          "name": "Learning_portal_user_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
@@ -1277,14 +1594,14 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user_meta": {
-      "name": "user_meta",
+    "public.Learning_portal_user_meta": {
+      "name": "Learning_portal_user_meta",
       "schema": "",
       "columns": {
         "userId": {
           "name": "userId",
           "type": "text",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true
         },
         "phone_number": {
@@ -1303,21 +1620,23 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "user_meta_userId_user_id_fk": {
-          "name": "user_meta_userId_user_id_fk",
-          "tableFrom": "user_meta",
-          "tableTo": "user",
+        "Learning_portal_user_meta_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_user_meta_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_user_meta",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -1334,8 +1653,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.verification": {
-      "name": "verification",
+    "public.Learning_portal_verification": {
+      "name": "Learning_portal_verification",
       "schema": "",
       "columns": {
         "id": {
@@ -1366,13 +1685,15 @@
           "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -1383,14 +1704,14 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.xp_": {
-      "name": "xp_",
+    "public.Learning_portal_xp": {
+      "name": "Learning_portal_xp",
       "schema": "",
       "columns": {
         "userId": {
           "name": "userId",
           "type": "text",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true
         },
         "xp": {
@@ -1399,19 +1720,78 @@
           "primaryKey": false,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
+        "updatedAt": {
+          "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "xp__userId_user_id_fk": {
-          "name": "xp__userId_user_id_fk",
-          "tableFrom": "xp_",
-          "tableTo": "user",
+        "Learning_portal_xp_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_xp_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_xp",
+          "tableTo": "Learning_portal_user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Learning_portal_xp_log": {
+      "name": "Learning_portal_xp_log",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "xpChange": {
+          "name": "xpChange",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Learning_portal_xp_log_userId_Learning_portal_user_id_fk": {
+          "name": "Learning_portal_xp_log_userId_Learning_portal_user_id_fk",
+          "tableFrom": "Learning_portal_xp_log",
+          "tableTo": "Learning_portal_user",
           "columnsFrom": [
             "userId"
           ],
@@ -1439,6 +1819,15 @@
         "mkce"
       ]
     },
+    "public.content_type": {
+      "name": "content_type",
+      "schema": "public",
+      "values": [
+        "video",
+        "article",
+        "ppt"
+      ]
+    },
     "public.department": {
       "name": "department",
       "schema": "public",
@@ -1456,13 +1845,14 @@
       "values": [
         "active",
         "viewed",
-        "delete"
+        "deleted"
       ]
     },
     "public.roles": {
       "name": "roles",
       "schema": "public",
       "values": [
+        "superAdmin",
         "admin",
         "manager",
         "staff"
