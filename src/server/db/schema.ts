@@ -19,7 +19,7 @@ export const createTable = pgTableCreator(
 
 
 /* 1. Managers (needs roles enum) */
-export const rolesEnum = pgEnum("roles", ["superAdmin", "admin", "manager", "staff"]);
+export const rolesEnum = pgEnum("roles", ["superAdmin", "admin", "manager", "faculity"]);
 
 export const college = pgEnum("college", ["krce", "krct", "mkce"])
 
@@ -108,9 +108,39 @@ export const course = createTable("course", (d) => ({
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
+export const courseMeta = createTable("course_meta", (d) => ({
+  courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }).primaryKey(),
+  category: d.text(),
+  thumbnail: d.text(),
+  difficulty: d.text(),
+  duration: d.text(),
+  data: d.jsonb(), 
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
+}));
+
+export const topic = createTable("topic", (d) => ({
+  id: d.serial().primaryKey(),
+  name: d.text().notNull(),
+  description: d.text(),
+  order: d.integer().notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
+}));
+
+export const courseModule = createTable("module", (d) => ({
+  id: d.serial().primaryKey(),
+  topicId: d.integer().notNull().references(() => topic.id, { onDelete: "cascade" }),
+  title: d.text().notNull(),
+  description: d.text(),
+  order: d.integer().notNull(),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
+}));
+
 export const content = createTable("content", (d) => ({
   id: d.serial().primaryKey(),
-  courseId: d.integer().notNull().references(() => course.id, { onDelete: "cascade" }),
+  contentId: d.integer().notNull().references(() => courseModule.id, { onDelete: "cascade" }),
   order: d.integer().notNull(),
   title: d.text().notNull(),
   body: d.text(),
@@ -119,8 +149,6 @@ export const content = createTable("content", (d) => ({
   contentMeta: d.jsonb(), // Additional metadata (e.g., video duration)
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
-}), (t) => ({
-  courseOrderIdx: uniqueIndex('course_order_idx').on(t.courseId, t.order)
 }));
 
 
@@ -148,21 +176,39 @@ export const question = createTable("question", (d) => ({
   updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
-export const endQuiz = createTable("end_quiz", (d) => ({
+export const quiz = createTable("quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
+  contentIdIdx: index('quiz_content_id_idx').on(t.contentId)
+}));
+
+export const endQuiz = createTable("end_quiz", (d) => ({
+  id: d.serial().primaryKey(),
+  contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
+  quizId: d.integer().notNull().references(() => quiz.id, { onDelete: "cascade" }),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
+}), (t) => ({
   contentIdIdx: index('end_quiz_content_id_idx').on(t.contentId)
+}));
+
+export const moduleQuiz = createTable("module_quiz", (d) => ({
+  id: d.serial().primaryKey(),
+  moduleId: d.integer().notNull().references(() => courseModule.id, { onDelete: "cascade" }),
+  quizId: d.integer().notNull().references(() => quiz.id, { onDelete: "cascade" }),
+  createdAt: d.timestamp().defaultNow().notNull(),
+  updatedAt: d.timestamp().defaultNow().notNull(),
 }));
 
 export const modelQuiz = createTable("model_quiz", (d) => ({
   id: d.serial().primaryKey(),
   contentId: d.integer().notNull().references(() => content.id, { onDelete: "cascade" }),
   timeStamp: d.integer().notNull(), //in seconds
-  questionId: d.integer().notNull().references(() => question.id, { onDelete: "cascade" }),
+  quizId: d.integer().notNull().references(() => quiz.id, { onDelete: "cascade" }),
   createdAt: d.timestamp().defaultNow().notNull(),
   updatedAt: d.timestamp().defaultNow().notNull(),
 }), (t) => ({
